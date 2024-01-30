@@ -13,7 +13,7 @@ This is a simple web application that provides real-time weather information. Th
 
 ## How to Use
 
-1. Open the [Weather Web App](https://s27288-pj.github.io/Weather-App/).
+1. Open the [Weather Web App](https://lisek44.github.io/Weather-App/).
 2. Enter the name of your city or any location you want to check the weather for.
 3. Click the "Search" button or choose from selection list to retrieve real-time weather information.
 
