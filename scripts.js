@@ -138,21 +138,59 @@ async function handleInput() {
 
 // Functions to fetch weather data from OpenWeatherMap API
 async function getWeatherData(latitude, longitude) {
-  const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`);
-  const data = await response.json();
-  return data;
+  // const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`);
+  // const data = await response.json();
+  // return data;
+
+  try {
+    const response = await fetch(`https://weather-app-api-handler.glitch.me/currentWeather?latitude=${latitude}&longitude=${longitude}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch weather data.');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error:', error.message);
+    alert('An error occurred while fetching weather data.');
+  }
 }
 
 async function getForecastHourlyData(latitude, longitude) {
-  const response = await fetch(`https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&cnt=24`);
-  const data = await response.json();
-  return data.list;
+  // const response = await fetch(`https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&cnt=24`);
+  // const data = await response.json();
+  // return data.list;
+
+  try {
+    const response = await fetch(`https://weather-app-api-handler.glitch.me/forecastHourlyWeather?latitude=${latitude}&longitude=${longitude}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch weather data.');
+    }
+
+    const data = await response.json();
+    return data.list;
+  } catch (error) {
+    console.error('Error:', error.message);
+    alert('An error occurred while fetching weather data.');
+  }
 }
 
 async function getForecastDailyData(latitude, longitude) {
-  const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&cnt=7`);
-  const data = await response.json();
-  return data.list;
+  // const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&cnt=7`);
+  // const data = await response.json();
+  // return data.list;
+  try {
+    const response = await fetch(`https://weather-app-api-handler.glitch.me/forecastDailyWeather?latitude=${latitude}&longitude=${longitude}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch weather data.');
+    }
+
+    const data = await response.json();
+    return data.list;
+  } catch (error) {
+    console.error('Error:', error.message);
+    alert('An error occurred while fetching weather data.');
+  }
 }
 
 // Functions to fetch map data from OpenWeatherMap API add OpenStreetMap tiles and bind them to the map
