@@ -93,10 +93,9 @@ async function selectLocation(coordinates, place_name) {
   [longitude, latitude] = coordinates;
 
   try {
-    const weatherData = await getWeatherData(latitude, longitude);
-    const forecastHourlyData = await getForecastHourlyData(latitude, longitude);
-    const forecastDailyData = await getForecastDailyData(latitude, longitude);
   
+    const weatherData = await getWeatherData(latitude, longitude);
+
     const mapContainer = document.getElementById('map-container');
     mapContainer.style.display = 'grid';
     const mapBoxTemperature = document.getElementById('map-box-temperature');
@@ -106,9 +105,7 @@ async function selectLocation(coordinates, place_name) {
     const mapBoxWind = document.getElementById('map-box-wind');
     mapBoxWind.style.display = 'block';
 
-    displayCurrentWeather(weatherData, place_name);
-    displayForecastHourlyData(forecastHourlyData, weatherData);
-    displayForecastDailyData(forecastDailyData, weatherData);
+    displayWeatherData(weatherData, place_name);
 
     displayMapData();
 
@@ -144,43 +141,13 @@ async function handleInput() {
 // Functions to fetch weather data from OpenWeatherMap API
 async function getWeatherData(latitude, longitude) {
   try {
-    const response = await fetch(`https://weather-app-api-handler.glitch.me/currentWeather?latitude=${latitude}&longitude=${longitude}`);
+    const response = await fetch(`https://weather-app-api-handler.glitch.me/One-Call-API?latitude=${latitude}&longitude=${longitude}`);
     if (!response.ok) {
       throw new Error('Failed to fetch weather data.');
     }
 
     const data = await response.json();
     return data;
-  } catch (error) {
-    console.error('Error:', error.message);
-    alert('An error occurred while fetching weather data.');
-  }
-}
-
-async function getForecastHourlyData(latitude, longitude) {
-  try {
-    const response = await fetch(`https://weather-app-api-handler.glitch.me/forecastHourlyWeather?latitude=${latitude}&longitude=${longitude}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch weather data.');
-    }
-
-    const data = await response.json();
-    return data.list;
-  } catch (error) {
-    console.error('Error:', error.message);
-    alert('An error occurred while fetching weather data.');
-  }
-}
-
-async function getForecastDailyData(latitude, longitude) {
-  try {
-    const response = await fetch(`https://weather-app-api-handler.glitch.me/forecastDailyWeather?latitude=${latitude}&longitude=${longitude}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch weather data.');
-    }
-
-    const data = await response.json();
-    return data.list;
   } catch (error) {
     console.error('Error:', error.message);
     alert('An error occurred while fetching weather data.');
@@ -268,29 +235,35 @@ async function getWNDMapData(latitude, longitude) {
   weatherLayer.addTo(WNDMap);
 }
 
-// Function to display current weather and secrets
-function displayCurrentWeather(weather, place_name) {
+// Function to handle and display weather data
+function displayWeatherData(weatherData, place_name) {
   const currentWeatherTitle = document.getElementById('current-weather-title');
   currentWeatherTitle.innerHTML = `<h2>Current Weather in ${place_name}</h2>`;
 
-  const sunrise = new Date(weather.sys.sunrise * 1000 + weather.timezone * 1000 - 3600 * 1000).toLocaleTimeString();
-  const sunset = new Date(weather.sys.sunset * 1000 + weather.timezone * 1000 - 3600 * 1000).toLocaleTimeString();
+  const browserTime = new Date();
+  const timezoneOffset = browserTime.getTimezoneOffset() * 60;
+
+  const sunrise = new Date(weatherData.current.sunrise * 1000);
+  const sunset = new Date(weatherData.current.sunset * 1000);
+
+  sunrise.setTime(sunrise.getTime() + weatherData.timezone_offset * 1000 + timezoneOffset * 1000);
+  sunset.setTime(sunset.getTime() + weatherData.timezone_offset * 1000 + timezoneOffset * 1000);
 
   const currentWeatherElement = document.getElementById('current-weather');
   currentWeatherElement.innerHTML = `
-    <p class="current-weather-description">Weather: ${capitalizeFirstLetter(weather.weather[0].description)}</p>
-    <p class="current-weather-temperature">Temperature: ${Math.round(weather.main.temp)}°C</p>
-    <p class="current-weather-feels-like">Feels Like: ${Math.round(weather.main.feels_like)}°C</p>
-    <p class="current-weather-humidity">Humidity: ${Math.round(weather.main.humidity)}%</p>
-    <p class="current-weather-pressure">Pressure: ${Math.round(weather.main.pressure)}hPa</p>
-    <p class="current-weather-visibility">Visibility: ${Math.round(weather.visibility / 1000 * 10) / 10}km</p>
-    <p class="current-weather-wind">Wind Speed: ${Math.round(weather.wind.speed * 10) / 10}m/s</p>
-    <p class="current-weather-sunrise">Sunrise: ${sunrise}</p>
-    <p class="current-weather-"sunset>Sunset: ${sunset}</p>
+    <p class="current-weather-description">Weather: ${capitalizeFirstLetter(weatherData.current.weather[0].description)}</p>
+    <p class="current-weather-temperature">Temperature: ${Math.round(weatherData.current.temp)}°C</p>
+    <p class="current-weather-feels-like">Feels Like: ${Math.round(weatherData.current.feels_like)}°C</p>
+    <p class="current-weather-humidity">Humidity: ${Math.round(weatherData.current.humidity)}%</p>
+    <p class="current-weather-pressure">Pressure: ${Math.round(weatherData.current.pressure)}hPa</p>
+    <p class="current-weather-visibility">Visibility: ${Math.round(weatherData.current.visibility / 1000 * 10) / 10}km</p>
+    <p class="current-weather-wind">Wind Speed: ${Math.round(weatherData.current.wind_speed * 10) / 10}m/s</p>
+    <p class="current-weather-sunrise">Sunrise: ${sunrise.toLocaleTimeString()}</p>
+    <p class="current-weather-sunset">Sunset: ${sunset.toLocaleTimeString()}</p>
   `;
 
   const currentWeatherIcon = document.getElementById('current-weather-icon');
-  const weatherIconID = weather.weather[0].icon;
+  const weatherIconID = weatherData.current.weather[0].icon;
 
   if (weatherIconID === '01d') {
     currentWeatherIcon.innerHTML = `<img src="images/icons/01d.png" alt="Current Weather Icon">`;
@@ -352,20 +325,20 @@ function displayCurrentWeather(weather, place_name) {
 
   // Memes
   const memeBoxElement = document.getElementById('meme-box');
-  if (Math.round(weather.main.temp) <= -10) {
+  if (Math.round(weatherData.current.temp) <= -10) {
     memeBoxElement.innerHTML = `<img src="images/memes/Jack-Nicholson-The-Shining-Snow.jpg" alt="Meme">`;
-  } else if (Math.round(weather.main.temp) >= 20 && weather.main.temp <= 25) {
+  } else if (Math.round(weatherData.current.temp) >= 20 && weatherData.current.temp <= 25) {
     memeBoxElement.innerHTML = `<img src="images/memes/0_ZjYSm_q36J4KChdn.jpg" alt="Meme">`;
-  } else if (Math.round(weather.main.temp) > 25 && weather.main.temp <= 30) {
+  } else if (Math.round(weatherData.current.temp) > 25 && weatherData.current.temp <= 30) {
     memeBoxElement.innerHTML = `<img src="images/memes/5d018c085cf9819634dee6572fb5dd79.jpg" alt="Meme">`;
-  } else if (Math.round(weather.main.temp) > 30) { 
+  } else if (Math.round(weatherData.current.temp) > 30) { 
     memeBoxElement.innerHTML = `<img src="images/memes/Heat_wave.jpg" alt="Meme">`;
-  } else if (Math.round(weather.main.temp) >= -9 && weather.main.temp < 19) {
-    if (weather.weather[0].main === 'Rain' || weather.weather[0].main === 'Drizzle' || weather.weather[0].main === 'Thunderstorm') {
+  } else if (Math.round(weatherData.current.temp) >= -9 && weatherData.current.temp < 19) {
+    if (weatherData.current.weather[0].main === 'Rain' || weatherData.current.weather[0].main === 'Drizzle' || weatherData.current.weather[0].main === 'Thunderstorm') {
       memeBoxElement.innerHTML = `<img src="images/memes/8d37f35ff717b6691ab1acf90dce6c83.jpg" alt="Meme">`;
-    } else if (weather.weather[0].main === 'Snow') {
+    } else if (weatherData.current.weather[0].main === 'Snow') {
       memeBoxElement.innerHTML = `<img src="images/memes/Snowing.jpg" alt="Meme">`;
-    } else if (weather.weather[0].main === 'Clouds') {
+    } else if (weatherData.current.weather[0].main === 'Clouds') {
       memeBoxElement.innerHTML = `<img src="images/memes/Clouds.jpg" alt="Meme">`; 
     } else if (weatherIconID === '50d') {
       memeBoxElement.innerHTML = `<img src="images/memes/Mist.jpg" alt="Meme">`;
@@ -385,23 +358,19 @@ function displayCurrentWeather(weather, place_name) {
   // Display the current weather container
   const currentWeatherContainer = document.getElementById('current-weather-container');
   currentWeatherContainer.style.display = 'grid';
-  
-}
 
-// Function to display forecast hourly data
-function displayForecastHourlyData(forecastHourly, weather) {
+  // Display Forecast Hourly data
   const forecastHourlyDataElement = document.getElementById('forecast-hourly-box');
   forecastHourlyDataElement.innerHTML = '';
-  const weatherData = weather;
 
-  forecastHourly.forEach(hour => {
-    const date = new Date(hour.dt * 1000 + weatherData.timezone * 1000); // Convert Unix timestamp to JavaScript date object
+  weatherData.hourly.slice(1, 25).forEach(hour => {
+    const date = new Date(hour.dt * 1000 + weatherData.timezone_offset * 1000 + timezoneOffset * 1000); // Convert Unix timestamp to JavaScript date object
     const time = date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
     
     const weather = hour.weather[0];
-    const temperature = Math.round(hour.main.temp);
-    const feelsLike = Math.round(hour.main.feels_like);
-    const humidity = Math.round(hour.main.humidity);
+    const temperature = Math.round(hour.temp);
+    const feelsLike = Math.round(hour.feels_like);
+    const humidity = Math.round(hour.humidity);
     const description = capitalizeFirstLetter(weather.description);
     const iconUrl = `images/icons/${weather.icon}.png`;
 
@@ -416,25 +385,24 @@ function displayForecastHourlyData(forecastHourly, weather) {
     `;
     forecastHourlyDataElement.innerHTML += forecastItem;
   });
+
   // Display the forecast title and table
   const forecastHourlyContainer = document.getElementById('forecast-hourly-container');
   forecastHourlyContainer.style.display = 'grid';
-}
 
-// Function to display forecast daily data
-function displayForecastDailyData(forecastDaily, weather) {
+  // Display Forecast Daily data
   const forecastDailyDataElement = document.getElementById('forecast-daily-box');
   forecastDailyDataElement.innerHTML = '';
 
-  forecastDaily.forEach(day => {
-    const date = new Date(day.dt * 1000);
+  weatherData.daily.slice(0, 7).forEach(day => {
+    const date = new Date(day.dt * 1000 + weatherData.timezone_offset * 1000 + timezoneOffset * 1000);
     const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
     const weather = day.weather[0];
     const temperatureDay = Math.round(day.temp.day);
     const temperatureNight = Math.round(day.temp.night);
     const humidity = Math.round(day.humidity);
     const pressure = Math.round(day.pressure);
-    const speed = Math.round(day.speed * 10) / 10;
+    const speed = Math.round(day.wind_speed * 10) / 10;
     const description = capitalizeFirstLetter(weather.description);
     const iconUrl = `images/icons/${weather.icon}.png`;
 
@@ -444,7 +412,7 @@ function displayForecastDailyData(forecastDaily, weather) {
         <div class="forecast-daily-temperature-day"><p>Day: ${temperatureDay}°C</p></div>
         <div class="forecast-daily-temperature-night"><p>Night: ${temperatureNight}°C</p></div>
         <div class="forecast-daily-humidity"><p>Humidity: ${humidity}%</p></div>
-        <div class="forecast-daily-pressure"><p>P: ${pressure}hPa</p></div>
+        <div class="forecast-daily-pressure"><p>Pressure: ${pressure}hPa</p></div>
         <div class="forecast-daily-wind"><p>Wind: ${speed}m/s</p></div>
         <div class="forecast-daily-icon"><img src="${iconUrl}" alt="${description}"></div>
         <div class="forecast-daily-description"><p>${description}</p></div>        
@@ -452,6 +420,7 @@ function displayForecastDailyData(forecastDaily, weather) {
     `;
     forecastDailyDataElement.innerHTML += forecastItem;
   });
+
   // Display the forecast title and table
   const forecastDailyContainer = document.getElementById('forecast-daily-container');
   forecastDailyContainer.style.display = 'grid';
