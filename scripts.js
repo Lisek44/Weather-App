@@ -11,10 +11,6 @@ function loadCSSBasedOnUserAgent() {
 loadCSSBasedOnUserAgent();
 
 const apiKey = '49b0abfbcd72adcfc70fc7f555198b19';
-const mapboxToken = 'pk.eyJ1IjoiczI3Mjg4IiwiYSI6ImNscnA4OW14cDAyZXAyam96Z25rZHdpd3QifQ.8r4lC0ndDr_xmmGzsWKjaQ';
-
-// const apiKey = process.env.REACT_APP_OPENWEATHERMAPAPI;
-// const mapboxToken = process.env.REACT_APP_MAPBOXTOKEN;
 
 localStorage.setItem('popupClosed', false);
 
@@ -59,15 +55,6 @@ if (localStorage.getItem(MODE_KEY)) {
 
 // Function to fetch location suggestions from MapBox API
 async function getLocationSuggestions(query) {
-  // const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?access_token=${mapboxToken}`);
-  // const data = await response.json();
-  // return data.features.map(feature => {
-  //   return {
-  //     place_name: feature.place_name,
-  //     coordinates: feature.center
-  //   };
-  // });
-
   try {
     const response = await fetch(`https://weather-app-api-handler.glitch.me/mapboxSuggestions?suggestQuery=${query}`);
     if (!response.ok) {
@@ -156,10 +143,6 @@ async function handleInput() {
 
 // Functions to fetch weather data from OpenWeatherMap API
 async function getWeatherData(latitude, longitude) {
-  // const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`);
-  // const data = await response.json();
-  // return data;
-
   try {
     const response = await fetch(`https://weather-app-api-handler.glitch.me/currentWeather?latitude=${latitude}&longitude=${longitude}`);
     if (!response.ok) {
@@ -175,10 +158,6 @@ async function getWeatherData(latitude, longitude) {
 }
 
 async function getForecastHourlyData(latitude, longitude) {
-  // const response = await fetch(`https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&cnt=24`);
-  // const data = await response.json();
-  // return data.list;
-
   try {
     const response = await fetch(`https://weather-app-api-handler.glitch.me/forecastHourlyWeather?latitude=${latitude}&longitude=${longitude}`);
     if (!response.ok) {
@@ -194,9 +173,6 @@ async function getForecastHourlyData(latitude, longitude) {
 }
 
 async function getForecastDailyData(latitude, longitude) {
-  // const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&cnt=7`);
-  // const data = await response.json();
-  // return data.list;
   try {
     const response = await fetch(`https://weather-app-api-handler.glitch.me/forecastDailyWeather?latitude=${latitude}&longitude=${longitude}`);
     if (!response.ok) {
