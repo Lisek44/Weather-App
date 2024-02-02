@@ -4,7 +4,7 @@ const cron = require('node-cron');
 const axios = require('axios');
 const fs = require('fs').promises;
 const bodyParser = require('body-parser');
-const { format, isToday } = require('date-fns');
+const { format, isToday, getMonth } = require('date-fns');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,58 +18,90 @@ app.use(cors());
 // Use bodyParser middleware to parse JSON requests
 app.use(bodyParser.json());
 
-const countFilePath = '.data/APIcallCount.txt';
+const countOWMAPIFilePath = '.data/OWMAPICallCount.txt';
+const countMapBoxFilePath = 'MapBoxAPICallCount.txt';
 const dateFilePath = '.data/LastApiCallDate.txt';
-let apiCallCount = 0;
+let OWMAPICallCount = 0;
+let MapBoxCallCount = 0;
 
 // Read API call count and last API call date from file at the start of the server
 (async () => {
   try {
-    const [fileContent, dateContent] = await Promise.all([
-      fs.readFile(countFilePath, 'utf-8'),
+    const [OWMAPIfileContent, MapBoxFileContent, dateContent] = await Promise.all([
+      fs.readFile(countOWMAPIFilePath, 'utf-8'),
+      fs.readFile(countMapBoxFilePath, 'utf-8'),
       fs.readFile(dateFilePath, 'utf-8')
     ]);
 
-    apiCallCount = parseInt(fileContent, 10) || 0;
+    OWMAPICallCount = parseInt(OWMAPIfileContent, 10) || 0;
+    MapBoxCallCount = parseInt(MapBoxFileContent, 10) || 0;
 
     const lastApiCallDate = new Date(dateContent.trim());
 
     if (!isToday(lastApiCallDate)) {
       // If last API call date is not today, reset count and update date
-      apiCallCount = 0;
-      await fs.writeFile(countFilePath, '0');
+      OWMAPICallCount = 0;
+      await fs.writeFile(countOWMAPIFilePath, '0');
       await fs.writeFile(dateFilePath, format(new Date(), 'yyyy-MM-dd'));
     }
+    
+    if (getMonth(lastApiCallDate) !== getMonth(new Date())) {
+      
+      MapBoxCallCount = 0;
+      await fs.writeFile(countMapBoxFilePath, '0');
+    }
 
-    console.log('API call count initialized:', apiCallCount);
+    console.log('API call count initialized:', OWMAPICallCount);
   } catch (error) {
     console.error('Error reading API call count or date file:', error);
   }
 })();
 // TODO: counting as 2
 
-// Middleware to count API calls and save to file
-const countMiddleware = async (req, res, next) => {
-  apiCallCount++;
-  await fs.writeFile(countFilePath, `${apiCallCount}`);
+// Middleware to count OWMAPI calls and save to file
+const countMiddlewareOWMAPI = async (req, res, next) => {
+  OWMAPICallCount++;
+  await fs.writeFile(countOWMAPIFilePath, `${OWMAPICallCount}`);
   await fs.writeFile(dateFilePath, format(new Date(), 'yyyy-MM-dd'));
   next();
 };
 
-// Apply countMiddleware only to specific endpoints
-app.use(['/currentWeather', '/forecastHourlyWeather', '/forecastDailyWeather'], countMiddleware);
+// Apply countMiddlewareOWMAPI only to specific endpoints
+app.use(['/currentWeather', '/forecastHourlyWeather', '/forecastDailyWeather'], countMiddlewareOWMAPI);
 
-// Endpoint to get the current API call count
-app.get('/api-call-count', async (req, res) => {
+// Endpoint to get the current OWMAPI call count
+app.get('/OWMAPI-call-count', async (req, res) => {
   try {
     // Read the content of the count file
-    const fileContent = await fs.readFile(countFilePath, 'utf-8');
-
-    // Parse the content to a number
-    const savedApiCallCount = parseInt(fileContent, 10);
+    const fileContent = await fs.readFile(countOWMAPIFilePath, 'utf-8');
 
     // Send the total API call count (including the current session count) as the response
-    res.send(`${apiCallCount + savedApiCallCount}`);
+    res.send(`${fileContent}`);
+  } catch (error) {
+    console.error('Error reading API call count file:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Middleware to count MapBox calls and save to file
+const countMiddlewareMapBox = async (req, res, next) => {
+  MapBoxCallCount++;
+  await fs.writeFile(countMapBoxFilePath, `${MapBoxCallCount}`);
+  next();
+};
+
+// Apply countMiddlewareOWMAPI only to specific endpoints
+app.use(['/mapboxSuggestions'], countMiddlewareMapBox);
+
+
+// Endpoint to get the current MapBox APi calls count
+app.get('/MapBox-call-count', async (req, res) => {
+  try {
+    // Read the content of the count file
+    const fileContent = await fs.readFile(countMapBoxFilePath, 'utf-8');
+
+    // Send the total API call count (including the current session count) as the response
+    res.send(`${fileContent}`);
   } catch (error) {
     console.error('Error reading API call count file:', error);
     res.status(500).send('Internal Server Error');
@@ -154,6 +186,56 @@ app.get('/forecastDailyWeather', async (req, res) => {
 
   try {
     const response = await axios.get(apiUrl);
+    res.json(response.data);
+    
+  } catch (error) {
+    console.error('Error fetching weather data:', error.response ? error.response.data : error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/mapboxSuggestions', async (req, res) => {
+  
+  const suggestQuery = req.query.suggestQuery;
+  
+  if (!suggestQuery) {
+    return res.status(400).json({ error: 'Suggestion_Query parameter is missing' });
+  }
+  
+  console.log('Suggestion_Query parameter is properly handled');
+  
+  const mapboxapiUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${suggestQuery}.json?access_token=${mapboxToken}`;
+  
+  try {
+    const response = await axios.get(mapboxapiUrl);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching suggestion:', error.response ? error.response.data : error.message);
+    res.status(500).json({ error: 'Internal Server Error'});
+  }
+});
+
+app.get('/One-Call-API', async (req, res) => {
+
+  const latitude = req.query.latitude;
+  const longitude = req.query.longitude;
+  
+  if (!latitude) {
+    return res.status(400).json({ error: 'Latitude parameter is missing' });
+  }
+  
+  console.log('Latitude parameter is properly handled');
+  
+  if (!longitude) {
+    return res.status(400).json({ error: 'Longitude parameter is missing' });
+  }
+  
+  console.log('Longitude parameter is properly handled');
+
+  const OneCallapiUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=${OWMapiKey}&units=metric`;
+
+  try {
+    const response = await axios.get(OneCallapiUrl);
     res.json(response.data);
     
   } catch (error) {

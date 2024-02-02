@@ -59,14 +59,32 @@ if (localStorage.getItem(MODE_KEY)) {
 
 // Function to fetch location suggestions from MapBox API
 async function getLocationSuggestions(query) {
-  const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?access_token=${mapboxToken}`);
-  const data = await response.json();
-  return data.features.map(feature => {
-    return {
-      place_name: feature.place_name,
-      coordinates: feature.center
-    };
-  });
+  // const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?access_token=${mapboxToken}`);
+  // const data = await response.json();
+  // return data.features.map(feature => {
+  //   return {
+  //     place_name: feature.place_name,
+  //     coordinates: feature.center
+  //   };
+  // });
+
+  try {
+    const response = await fetch(`https://weather-app-api-handler.glitch.me/mapboxSuggestions?suggestQuery=${query}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch location suggestions.');
+    }
+
+    const data = await response.json();
+    return data.features.map(feature => {
+        return {
+          place_name: feature.place_name,
+          coordinates: feature.center
+        };
+      });
+  } catch (error) {
+    console.error('Error:', error.message);
+    alert('An error occurred while fetching location suggestions.');
+  }
 }
 
 // Function to display location suggestions
