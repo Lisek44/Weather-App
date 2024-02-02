@@ -56,10 +56,13 @@ let MapBoxCallCount = 0;
     console.error('Error reading API call count or date file:', error);
   }
 })();
-// TODO: counting as 2
 
-// Middleware to count OWMAPI calls and save to file
+// Middleware to count OWMAPI  calls and save to file
 const countMiddlewareOWMAPI = async (req, res, next) => {
+  if (MapBoxCallCount == 1000) {
+    console.error('Error - Daily limit of OpenWeatherMap One Call API calls depleted');
+    res.status(503).send('Error - Daily limit of OpenWeatherMap One Call API calls depleted');
+  }
   OWMAPICallCount++;
   await fs.writeFile(countOWMAPIFilePath, `${OWMAPICallCount}`);
   await fs.writeFile(dateFilePath, format(new Date(), 'yyyy-MM-dd'));
@@ -85,6 +88,10 @@ app.get('/OWMAPI-call-count', async (req, res) => {
 
 // Middleware to count MapBox calls and save to file
 const countMiddlewareMapBox = async (req, res, next) => {
+  if (MapBoxCallCount == 100000) {
+    console.error('Error - Monthly limit of Mapbox API calls depleted');
+    res.status(503).send('Error - Monthly limit of Mapbox API calls depleted');
+  }
   MapBoxCallCount++;
   await fs.writeFile(countMapBoxFilePath, `${MapBoxCallCount}`);
   next();
