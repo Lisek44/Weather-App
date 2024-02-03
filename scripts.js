@@ -56,18 +56,30 @@ if (localStorage.getItem(MODE_KEY)) {
 // Function to fetch location suggestions from MapBox API
 async function getLocationSuggestions(query) {
   try {
-    const response = await fetch(`https://weather-app-api-handler.glitch.me/mapboxSuggestions?suggestQuery=${query}`);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+      throw new Error('Request timed out.');
+    }, 5000);
+
+    const response = await fetch(`https://weather-app-api-handler.glitch.me/mapboxSuggestions?suggestQuery=${query}`, {
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
       throw new Error('Failed to fetch location suggestions.');
     }
 
     const data = await response.json();
     return data.features.map(feature => {
-        return {
-          place_name: feature.place_name,
-          coordinates: feature.center
-        };
-      });
+      return {
+        place_name: feature.place_name,
+        coordinates: feature.center
+      };
+    });
   } catch (error) {
     console.error('Error:', error.message);
     alert('An error occurred while fetching location suggestions.');
@@ -129,19 +141,36 @@ async function selectLocation(coordinates, place_name) {
 // Function to handle user input for location autocomplete
 async function handleInput() {
   const locationInput = document.getElementById('location-input-field').value;
-  if (locationInput.length > 0) {
+  const suggestionsList = document.getElementById('suggestions-list');
+  
+  if (locationInput.length >= 3) {
     const suggestions = await getLocationSuggestions(locationInput);
     displayLocationSuggestions(suggestions);
   } else {
-    const suggestionsList = document.getElementById('suggestions-list');
     suggestionsList.innerHTML = '';
+    suggestionsList.style.display = 'none';
   }
 }
 
 // Functions to fetch weather data from OpenWeatherMap API
 async function getWeatherData(latitude, longitude) {
   try {
-    const response = await fetch(`https://weather-app-api-handler.glitch.me/One-Call-API?latitude=${latitude}&longitude=${longitude}`);
+    displayPopupWaiting();
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+      closePopupWaiting();
+      throw new Error('Request timed out.');
+    }, 5000);
+
+    const response = await fetch(`https://weather-app-api-handler.glitch.me/One-Call-API?latitude=${latitude}&longitude=${longitude}`, {
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+    closePopupWaiting();
+
     if (!response.ok) {
       throw new Error('Failed to fetch weather data.');
     }
@@ -149,6 +178,7 @@ async function getWeatherData(latitude, longitude) {
     const data = await response.json();
     return data;
   } catch (error) {
+    closePopupWaiting();
     console.error('Error:', error.message);
     alert('An error occurred while fetching weather data.');
   }
@@ -485,6 +515,28 @@ function displayPopupOnDesktop() {
 function closePopup() {
   const popup = document.getElementById('popup');
   popup.style.display = 'none';
+}
+
+// Function to display the popup-waiting
+function displayPopupWaiting() {
+  const popupWaiting = document.getElementById('popup-waiting');
+  popupWaiting.innerHTML = `<p>Waiting for server response...</p>`;
+  popupWaiting.style.display = 'block';
+}
+
+// Function to close the popup-waiting
+function closePopupWaiting() {
+  const popupWaiting = document.getElementById('popup-waiting');
+  popupWaiting.style.display = 'none';
+}
+
+// Function to start Node.js server
+function startNodeServer() {
+  const response = fetch(`https://weather-app-api-handler.glitch.me/startServer`);
+  if (!response.ok) {
+    throw new Error('Failed to start Node.js server.');
+  }
+  // console.log('Node.js server started.');
 }
 
 // Function to display the meme container

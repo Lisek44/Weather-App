@@ -19,7 +19,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const countOWMAPIFilePath = '.data/OWMAPICallCount.txt';
-const countMapBoxFilePath = 'MapBoxAPICallCount.txt';
+const countMapBoxFilePath = '.data/MapBoxAPICallCount.txt';
 const dateFilePath = '.data/LastApiCallDate.txt';
 let OWMAPICallCount = 0;
 let MapBoxCallCount = 0;
@@ -51,7 +51,7 @@ let MapBoxCallCount = 0;
       await fs.writeFile(countMapBoxFilePath, '0');
     }
 
-    console.log('API call count initialized:', OWMAPICallCount);
+    // console.log('API call count initialized:', OWMAPICallCount);
   } catch (error) {
     console.error('Error reading API call count or date file:', error);
   }
@@ -59,7 +59,7 @@ let MapBoxCallCount = 0;
 
 // Middleware to count OWMAPI  calls and save to file
 const countMiddlewareOWMAPI = async (req, res, next) => {
-  if (MapBoxCallCount == 1000) {
+  if (OWMAPICallCount >= 1000) {
     console.error('Error - Daily limit of OpenWeatherMap One Call API calls depleted');
     res.status(503).send('Error - Daily limit of OpenWeatherMap One Call API calls depleted');
   }
@@ -70,7 +70,7 @@ const countMiddlewareOWMAPI = async (req, res, next) => {
 };
 
 // Apply countMiddlewareOWMAPI only to specific endpoints
-app.use(['/currentWeather', '/forecastHourlyWeather', '/forecastDailyWeather'], countMiddlewareOWMAPI);
+app.use(['/currentWeather', '/forecastHourlyWeather', '/forecastDailyWeather', '/One-Call-API'], countMiddlewareOWMAPI);
 
 // Endpoint to get the current OWMAPI call count
 app.get('/OWMAPI-call-count', async (req, res) => {
@@ -100,7 +100,6 @@ const countMiddlewareMapBox = async (req, res, next) => {
 // Apply countMiddlewareOWMAPI only to specific endpoints
 app.use(['/mapboxSuggestions'], countMiddlewareMapBox);
 
-
 // Endpoint to get the current MapBox APi calls count
 app.get('/MapBox-call-count', async (req, res) => {
   try {
@@ -113,6 +112,10 @@ app.get('/MapBox-call-count', async (req, res) => {
     console.error('Error reading API call count file:', error);
     res.status(500).send('Internal Server Error');
   }
+});
+
+app.get('/startServer', async (req, res) => {
+  res.status(200).json({message: 'Server was started'})
 });
 
 app.get('/currentWeather', async (req, res) => {
@@ -135,12 +138,14 @@ app.get('/currentWeather', async (req, res) => {
   const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${OWMapiKey}&units=metric`;
 
   try {
-    const response = await axios.get(apiUrl);
+    const response = await axios.get(apiUrl, { timeout: 5000 });
     res.json(response.data);
     
   } catch (error) {
     console.error('Error fetching weather data:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Internal Server Error' });
+    // Send information to website about timeout
+    res.status(500).json({ error: 'Timeout'});
   }
 });
 
@@ -164,11 +169,13 @@ app.get('/forecastHourlyWeather', async (req, res) => {
   const apiUrl = `https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=${latitude}&lon=${longitude}&appid=${OWMapiKey}&units=metric&cnt=24`;
 
   try {
-    const response = await axios.get(apiUrl);
+    const response = await axios.get(apiUrl, { timeout: 5000 });
     res.json(response.data);
   } catch (error) {
     console.error('Error fetching weather data:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Internal Server Error' });
+    // Send information to website about timeout
+    res.status(500).json({ error: 'Timeout'});
   }
 });
 
@@ -192,12 +199,14 @@ app.get('/forecastDailyWeather', async (req, res) => {
   const apiUrl = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&appid=${OWMapiKey}&units=metric&cnt=7`;
 
   try {
-    const response = await axios.get(apiUrl);
+    const response = await axios.get(apiUrl, { timeout: 5000 });
     res.json(response.data);
     
   } catch (error) {
     console.error('Error fetching weather data:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Internal Server Error' });
+    // Send information to website about timeout
+    res.status(500).json({ error: 'Timeout'});
   }
 });
 
@@ -214,11 +223,13 @@ app.get('/mapboxSuggestions', async (req, res) => {
   const mapboxapiUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${suggestQuery}.json?access_token=${mapboxToken}`;
   
   try {
-    const response = await axios.get(mapboxapiUrl);
+    const response = await axios.get(mapboxapiUrl, { timeout: 5000 });
     res.json(response.data);
   } catch (error) {
     console.error('Error fetching suggestion:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Internal Server Error'});
+    // Send information to website about timeout
+    res.status(500).json({ error: 'Timeout'});
   }
 });
 
@@ -242,12 +253,14 @@ app.get('/One-Call-API', async (req, res) => {
   const OneCallapiUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=${OWMapiKey}&units=metric`;
 
   try {
-    const response = await axios.get(OneCallapiUrl);
+    const response = await axios.get(OneCallapiUrl, { timeout: 5000 });
     res.json(response.data);
     
   } catch (error) {
     console.error('Error fetching weather data:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Internal Server Error' });
+    // Send information to website about timeout
+    res.status(500).json({ error: 'Timeout'});
   }
 });
 
