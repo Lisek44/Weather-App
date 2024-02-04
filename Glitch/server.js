@@ -20,9 +20,11 @@ app.use(bodyParser.json());
 
 const countOWMAPIFilePath = '.data/OWMAPICallCount.txt';
 const countMapBoxFilePath = '.data/MapBoxAPICallCount.txt';
+const countOWMMapAPIFilePath = '.data/OWMMapAPICallCount.txt';
 const dateFilePath = '.data/LastApiCallDate.txt';
 let OWMAPICallCount = 0;
 let MapBoxCallCount = 0;
+let OWMMapAPICallCount = 0;
 
 // Read API call count and last API call date from file at the start of the server
 (async () => {
@@ -46,9 +48,10 @@ let MapBoxCallCount = 0;
     }
     
     if (getMonth(lastApiCallDate) !== getMonth(new Date())) {
-      
       MapBoxCallCount = 0;
+      OWMMapAPICallCount = 0;
       await fs.writeFile(countMapBoxFilePath, '0');
+      await fs.writeFile(countOWMMapAPIFilePath, '0');
     }
 
     // console.log('API call count initialized:', OWMAPICallCount);
@@ -114,100 +117,36 @@ app.get('/MapBox-call-count', async (req, res) => {
   }
 });
 
+// Middleware to count OWMAPI  calls and save to file
+const countMiddlewareOWMMap = async (req, res, next) => {
+  if (OWMMapAPICallCount >= 1000000) {
+    console.error('Error - Monthly limit of OpenWeatherMap Weather Map calls depleted');
+    res.status(503).send('Error - Monthly limit of OpenWeatherMap Weather Map calls depleted');
+  }
+  OWMMapAPICallCount++;
+  await fs.writeFile(countOWMMapAPIFilePath, `${OWMMapAPICallCount}`);
+  next();
+};
+
+// Apply countMiddlewareOWMAPI only to specific endpoints
+app.use(['/OWM-Map-API'], countMiddlewareOWMMap);
+
+// Endpoint to get the current OWMAPI call count
+app.get('/OWMapApi-call-count', async (req, res) => {
+  try {
+    // Read the content of the count file
+    const fileContent = await fs.readFile(countOWMMapAPIFilePath, 'utf-8');
+
+    // Send the total API call count (including the current session count) as the response
+    res.send(`${fileContent}`);
+  } catch (error) {
+    console.error('Error reading Map API call count file:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.get('/startServer', async (req, res) => {
   res.status(200).json({message: 'Server was started'})
-});
-
-app.get('/currentWeather', async (req, res) => {
-
-  const latitude = req.query.latitude;
-  const longitude = req.query.longitude;
-  
-  if (!latitude) {
-    return res.status(400).json({ error: 'Latitude parameter is missing' });
-  }
-  
-  console.log('Latitude parameter is properly handled');
-  
-  if (!longitude) {
-    return res.status(400).json({ error: 'Longitude parameter is missing' });
-  }
-  
-  console.log('Longitude parameter is properly handled');
-
-  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${OWMapiKey}&units=metric`;
-
-  try {
-    const response = await axios.get(apiUrl, { timeout: 5000 });
-    res.json(response.data);
-    
-  } catch (error) {
-    console.error('Error fetching weather data:', error.response ? error.response.data : error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
-    // Send information to website about timeout
-    res.status(500).json({ error: 'Timeout'});
-  }
-});
-
-app.get('/forecastHourlyWeather', async (req, res) => {
-
-  const latitude = req.query.latitude;
-  const longitude = req.query.longitude;
-  
-  if (!latitude) {
-    return res.status(400).json({ error: 'Latitude parameter is missing' });
-  }
-  
-  console.log('Latitude parameter is properly handled');
-  
-  if (!longitude) {
-    return res.status(400).json({ error: 'Longitude parameter is missing' });
-  }
-  
-  console.log('Longitude parameter is properly handled');
-
-  const apiUrl = `https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=${latitude}&lon=${longitude}&appid=${OWMapiKey}&units=metric&cnt=24`;
-
-  try {
-    const response = await axios.get(apiUrl, { timeout: 5000 });
-    res.json(response.data);
-  } catch (error) {
-    console.error('Error fetching weather data:', error.response ? error.response.data : error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
-    // Send information to website about timeout
-    res.status(500).json({ error: 'Timeout'});
-  }
-});
-
-app.get('/forecastDailyWeather', async (req, res) => {
-
-  const latitude = req.query.latitude;
-  const longitude = req.query.longitude;
-  
-  if (!latitude) {
-    return res.status(400).json({ error: 'Latitude parameter is missing' });
-  }
-  
-  console.log('Latitude parameter is properly handled');
-  
-  if (!longitude) {
-    return res.status(400).json({ error: 'Longitude parameter is missing' });
-  }
-  
-  console.log('Longitude parameter is properly handled');
-
-  const apiUrl = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&appid=${OWMapiKey}&units=metric&cnt=7`;
-
-  try {
-    const response = await axios.get(apiUrl, { timeout: 5000 });
-    res.json(response.data);
-    
-  } catch (error) {
-    console.error('Error fetching weather data:', error.response ? error.response.data : error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
-    // Send information to website about timeout
-    res.status(500).json({ error: 'Timeout'});
-  }
 });
 
 app.get('/mapboxSuggestions', async (req, res) => {
@@ -261,6 +200,46 @@ app.get('/One-Call-API', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
     // Send information to website about timeout
     res.status(500).json({ error: 'Timeout'});
+  }
+});
+
+app.get('/OWM-Map-API', async (req, res) => {
+
+  const latitude = req.query.latitude;
+  const longitude = req.query.longitude;
+  const zoom = req.query.zoom;
+  const layer = req.query.layer;
+  
+  if (!latitude) {
+    return res.status(400).json({ error: 'Latitude parameter is missing' });
+  }
+  console.log('Latitude parameter is properly handled');
+  
+  if (!longitude) {
+    return res.status(400).json({ error: 'Longitude parameter is missing' });
+  }
+  console.log('Longitude parameter is properly handled');
+
+  if (!zoom) {
+    return res.status(400).json({ error: 'Zoom parameter is missing' });
+  }
+  console.log('Zoom parameter is properly handled');
+
+  if (!layer) {
+    return res.status(400).json({ error: 'Layer parameter is missing' });
+  }
+  console.log('Layer parameter is properly handled');
+
+  const apiUrl = `https://tile.openweathermap.org/map/${layer}/${zoom}/${latitude}/${longitude}.png?appid=${OWMapiKey}`;
+  
+  try {
+    const response = await axios.get(apiUrl, { responseType: 'arraybuffer' });
+    const imageData = response.data;
+    res.set('Content-Type', 'image/png');
+    res.send(imageData);
+  } catch (error) {
+    console.error('Error fetching map tile data:', error.response ? error.response.data : error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

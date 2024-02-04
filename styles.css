@@ -1628,8 +1628,7 @@
     margin-left: 10px;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: 30% 40% auto ;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
     gap: 5px 5px;
     grid-column: 1 / span 2;
     grid-row: 7;
@@ -1641,8 +1640,7 @@
     margin-left: 10px;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: 30% 40% auto ;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
     gap: 5px 5px;
     grid-column: 1 / span 2;
     grid-row: 7;
@@ -1654,8 +1652,7 @@
     margin-left: 10px;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: 30% 40% auto ;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
     gap: 5px 5px;
     grid-column: 1 / span 2;
     grid-row: 7;
@@ -1669,7 +1666,6 @@
     border-radius: 8px;
     max-height: auto;
     align-items: center;
-    grid-column: 1 / span 3;
     grid-row: 1;
   }
   .default-mode #map-title h2 {
@@ -1688,7 +1684,6 @@
     border-radius: 8px;
     max-height: auto;
     align-items: center;
-    grid-column: 1 / span 3;
     grid-row: 1;
   }
   .light-mode #map-title h2 {
@@ -1707,7 +1702,6 @@
     border-radius: 8px;
     max-height: auto;
     align-items: center;
-    grid-column: 1 / span 3;
     grid-row: 1;
   }
   .dark-mode #map-title h2 {
@@ -1718,205 +1712,7 @@
     height: fit-content;
   }
 
-  .default-mode #map-temperature {
-    background-color:var(--default-background-color);
-    color: var(--default-text-color);
-    box-shadow:var(--default-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .default-mode #map-temperature p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .default-mode #map-temperature:hover {
-    color: var(--default-hover-color);
-    cursor: pointer;
-  }
-
-  .light-mode #map-temperature {
-    background-color:var(--light-background-color);
-    color: var(--light-text-color);
-    box-shadow:var(--light-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .light-mode #map-temperature p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .light-mode #map-temperature:hover {
-    color: var(--light-hover-color);
-    cursor: pointer;
-  }
-
-  .dark-mode #map-temperature {
-    background-color:var(--dark-background-color);
-    color: var(--dark-text-color);
-    box-shadow:var(--dark-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .dark-mode #map-temperature p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .dark-mode #map-temperature:hover {
-    color: var(--dark-hover-color);
-    cursor: pointer;
-  }
-
-  .default-mode #map-precipitation {
-    background-color:var(--default-background-color);
-    color: var(--default-text-color);
-    box-shadow:var(--default-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 2;
-    grid-row: 2;
-  }
-  .default-mode #map-precipitation p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .default-mode #map-precipitation:hover {
-    color: var(--default-hover-color);
-    cursor: pointer;
-  }
-
-  .light-mode #map-precipitation {
-    background-color:var(--light-background-color);
-    color: var(--light-text-color);
-    box-shadow:var(--light-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 2;
-    grid-row: 2;
-  }
-  .light-mode #map-precipitation p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .light-mode #map-precipitation:hover {
-    color: var(--light-hover-color);
-    cursor: pointer;
-  }
-
-  .dark-mode #map-precipitation {
-    background-color:var(--dark-background-color);
-    color: var(--dark-text-color);
-    box-shadow:var(--dark-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 2;
-    grid-row: 2;
-  }
-  .dark-mode #map-precipitation p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .dark-mode #map-precipitation:hover {
-    color: var(--dark-hover-color);
-    cursor: pointer;
-  }
-
-  .default-mode #map-wind {
-    background-color:var(--default-background-color);
-    color: var(--default-text-color);
-    box-shadow:var(--default-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 3;
-    grid-row: 2;
-  }
-  .default-mode #map-wind p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .default-mode #map-wind:hover {
-    color: var(--default-hover-color);
-    cursor: pointer;
-  }
-
-  .light-mode #map-wind {
-    background-color:var(--light-background-color);
-    color: var(--light-text-color);
-    box-shadow:var(--light-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 3;
-    grid-row: 2;
-  }
-  .light-mode #map-wind p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .light-mode #map-wind:hover {
-    color: var(--light-hover-color);
-    cursor: pointer;
-  }
-
-  .dark-mode #map-wind {
-    background-color:var(--dark-background-color);
-    color: var(--dark-text-color);
-    box-shadow:var(--dark-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 3;
-    grid-row: 2;
-  }
-  .dark-mode #map-wind p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .dark-mode #map-wind:hover {
-    color: var(--dark-hover-color);
-    cursor: pointer;
-  }
-
-  .default-mode .map-box {
+  .default-mode #map-box {
     background-color:var(--default-background-color);
     color: var(--default-text-color);
     box-shadow:var(--default-box-shadow);
@@ -1924,10 +1720,9 @@
     padding: 5px;
     width: 100% - 10px; 
     height: 500px;
-    grid-column: 1 / span 3;
-    grid-row: 3;
+    grid-row: 2;
   }
-  .light-mode .map-box {
+  .light-mode #map-box {
     background-color:var(--light-background-color);
     color: var(--light-text-color);
     box-shadow:var(--light-box-shadow);
@@ -1935,10 +1730,9 @@
     padding: 5px;
     width: 100% - 10px; 
     height: 500px;
-    grid-column: 1 / span 3;
-    grid-row: 3;
+    grid-row: 2;
   }
-  .dark-mode .map-box {
+  .dark-mode #map-box {
     background-color:var(--dark-background-color);
     color: var(--dark-text-color);
     box-shadow:var(--dark-box-shadow);
@@ -1946,8 +1740,7 @@
     padding: 5px;
     width: 100% - 10px; 
     height: 500px;
-    grid-column: 1 / span 3;
-    grid-row: 3;
+    grid-row: 2;
   }
 
   .default-mode #footer-container {
@@ -3436,8 +3229,7 @@
     margin-bottom: 5px;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: 30% 40% auto ;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
     gap: 5px 5px;
   }
   .light-mode #map-container {
@@ -3446,8 +3238,7 @@
     margin-bottom: 5px;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: 30% 40% auto ;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
     gap: 5px 5px;
   }
   .dark-mode #map-container {
@@ -3456,8 +3247,7 @@
     margin-bottom: 5px;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: 30% 40% auto ;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
     gap: 5px 5px;
   }
 
@@ -3469,7 +3259,6 @@
     border-radius: 8px;
     max-height: auto;
     align-items: center;
-    grid-column: 1 / span 3;
     grid-row: 1;
   }
   .default-mode #map-title h2 {
@@ -3488,7 +3277,6 @@
     border-radius: 8px;
     max-height: auto;
     align-items: center;
-    grid-column: 1 / span 3;
     grid-row: 1;
   }
   .light-mode #map-title h2 {
@@ -3507,7 +3295,6 @@
     border-radius: 8px;
     max-height: auto;
     align-items: center;
-    grid-column: 1 / span 3;
     grid-row: 1;
   }
   .dark-mode #map-title h2 {
@@ -3518,205 +3305,7 @@
     height: fit-content;
   }
 
-  .default-mode #map-temperature {
-    background-color:var(--default-background-color);
-    color: var(--default-text-color);
-    box-shadow:var(--default-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .default-mode #map-temperature p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .default-mode #map-temperature:hover {
-    color: var(--default-hover-color);
-    cursor: pointer;
-  }
-
-  .light-mode #map-temperature {
-    background-color:var(--light-background-color);
-    color: var(--light-text-color);
-    box-shadow:var(--light-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .light-mode #map-temperature p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .light-mode #map-temperature:hover {
-    color: var(--light-hover-color);
-    cursor: pointer;
-  }
-
-  .dark-mode #map-temperature {
-    background-color:var(--dark-background-color);
-    color: var(--dark-text-color);
-    box-shadow:var(--dark-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .dark-mode #map-temperature p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .dark-mode #map-temperature:hover {
-    color: var(--dark-hover-color);
-    cursor: pointer;
-  }
-
-  .default-mode #map-precipitation {
-    background-color:var(--default-background-color);
-    color: var(--default-text-color);
-    box-shadow:var(--default-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 2;
-    grid-row: 2;
-  }
-  .default-mode #map-precipitation p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .default-mode #map-precipitation:hover {
-    color: var(--default-hover-color);
-    cursor: pointer;
-  }
-
-  .light-mode #map-precipitation {
-    background-color:var(--light-background-color);
-    color: var(--light-text-color);
-    box-shadow:var(--light-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 2;
-    grid-row: 2;
-  }
-  .light-mode #map-precipitation p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .light-mode #map-precipitation:hover {
-    color: var(--light-hover-color);
-    cursor: pointer;
-  }
-
-  .dark-mode #map-precipitation {
-    background-color:var(--dark-background-color);
-    color: var(--dark-text-color);
-    box-shadow:var(--dark-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 2;
-    grid-row: 2;
-  }
-  .dark-mode #map-precipitation p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .dark-mode #map-precipitation:hover {
-    color: var(--dark-hover-color);
-    cursor: pointer;
-  }
-
-  .default-mode #map-wind {
-    background-color:var(--default-background-color);
-    color: var(--default-text-color);
-    box-shadow:var(--default-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 3;
-    grid-row: 2;
-  }
-  .default-mode #map-wind p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .default-mode #map-wind:hover {
-    color: var(--default-hover-color);
-    cursor: pointer;
-  }
-
-  .light-mode #map-wind {
-    background-color:var(--light-background-color);
-    color: var(--light-text-color);
-    box-shadow:var(--light-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 3;
-    grid-row: 2;
-  }
-  .light-mode #map-wind p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .light-mode #map-wind:hover {
-    color: var(--light-hover-color);
-    cursor: pointer;
-  }
-
-  .dark-mode #map-wind {
-    background-color:var(--dark-background-color);
-    color: var(--dark-text-color);
-    box-shadow:var(--dark-box-shadow);
-    border-radius: 8px;
-    padding: 5px;
-    width: auto; 
-    text-align: center;
-    grid-column: 3;
-    grid-row: 2;
-  }
-  .dark-mode #map-wind p {
-    margin: 0px;
-    padding: 0px;
-    font-size: 13px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  }
-  .dark-mode #map-wind:hover {
-    color: var(--dark-hover-color);
-    cursor: pointer;
-  }
-
-  .default-mode .map-box {
+  .default-mode #map-box {
     background-color:var(--default-background-color);
     color: var(--default-text-color);
     box-shadow:var(--default-box-shadow);
@@ -3724,10 +3313,9 @@
     padding: 5px;
     width: 100% - 10px; 
     height: 400px;
-    grid-column: 1 / span 3;
-    grid-row: 3;
+    grid-row: 2;
   }
-  .light-mode .map-box {
+  .light-mode #map-box {
     background-color:var(--light-background-color);
     color: var(--light-text-color);
     box-shadow:var(--light-box-shadow);
@@ -3735,10 +3323,9 @@
     padding: 5px;
     width: 100% - 10px; 
     height: 400px;
-    grid-column: 1 / span 3;
-    grid-row: 3;
+    grid-row: 2;
   }
-  .dark-mode .map-box {
+  .dark-mode #map-box {
     background-color:var(--dark-background-color);
     color: var(--dark-text-color);
     box-shadow:var(--dark-box-shadow);
@@ -3746,8 +3333,7 @@
     padding: 5px;
     width: 100% - 10px; 
     height: 400px;
-    grid-column: 1 / span 3;
-    grid-row: 3;
+    grid-row: 2;
   }
 
   .default-mode #footer-container {

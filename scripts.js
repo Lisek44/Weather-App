@@ -8,9 +8,21 @@ function loadCSSBasedOnUserAgent() {
   }
 }
 
-loadCSSBasedOnUserAgent();
+// Function to start Node.js server
+async function startNodeServer() {
+  displayPopupWaiting();
+  const response = await fetch(`https://weather-app-api-handler.glitch.me/startServer`);
+  if (!response.ok) {
+    closePopupWaiting();
+    throw new Error('Failed to start Node.js server.');
+  }
+  closePopupWaiting();
+}
 
-const apiKey = '49b0abfbcd72adcfc70fc7f555198b19';
+loadCSSBasedOnUserAgent();
+startNodeServer();
+
+// const apiKey = '49b0abfbcd72adcfc70fc7f555198b19';
 
 localStorage.setItem('popupClosed', false);
 
@@ -105,21 +117,10 @@ async function selectLocation(coordinates, place_name) {
   [longitude, latitude] = coordinates;
 
   try {
-  
     const weatherData = await getWeatherData(latitude, longitude);
 
-    const mapContainer = document.getElementById('map-container');
-    mapContainer.style.display = 'grid';
-    const mapBoxTemperature = document.getElementById('map-box-temperature');
-    mapBoxTemperature.style.display = 'block';
-    const mapBoxPrecipitation = document.getElementById('map-box-precipitation');
-    mapBoxPrecipitation.style.display = 'block';
-    const mapBoxWind = document.getElementById('map-box-wind');
-    mapBoxWind.style.display = 'block';
-
     displayWeatherData(weatherData, place_name);
-
-    displayMapData();
+    displayMapData(latitude, longitude);
 
     // Update the input field value
     const locationInput = document.getElementById('location-input-field');
@@ -184,85 +185,39 @@ async function getWeatherData(latitude, longitude) {
   }
 }
 
-// Functions to fetch map data from OpenWeatherMap API add OpenStreetMap tiles and bind them to the map
-async function getTA2MapData(latitude, longitude) {
-  const mapContainer = document.getElementById('map-box-temperature');
-  if (mapContainer && mapContainer._leaflet_id) {
-    mapContainer._leaflet_id = null;
+async function getMapData(latitude, longitude, layer, zoom) {
+
+  try {
+    displayPopupWaiting();
+
+    latitude = Math.round(latitude);
+    longitude = Math.round(longitude);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+      closePopupWaiting();
+      throw new Error('Request timed out.');
+    }, 5000);
+
+    const response = await fetch(`https://weather-app-api-handler.glitch.me/OWM-Map-API?latitude=${latitude}&longitude=${longitude}&layer=${layer}&zoom=${zoom}`, {
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+    closePopupWaiting();
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch map data.');
+    }
+    
+    const data = await response;
+    return data;
+  } catch (error) {
+    closePopupWaiting();
+    console.error('Error:', error.message);
+    alert('An error occurred while fetching map data.');
   }
-
-  mapContainer.innerHTML = '';
-
-  const TA2Map = L.map('map-box-temperature', {dragging: false, scrollWheelZoom: false, touchZoom: false, doubleClickZoom: false}).setView([latitude, longitude], 10);
-
-  const mapLayer =  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: 'Map &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-})
-
-  const weatherLayer = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/{op}/{z}/{x}/{y}?appid={apiKey}&opacity=0.6&fill_bound=true', {
-    apiKey: apiKey,
-    maxZoom: 18,
-    attribution: 'Weather &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>',
-    op: 'TA2',
-  })
-
-  // Add the layers to TA2Map
-  mapLayer.addTo(TA2Map);
-  weatherLayer.addTo(TA2Map);
-}
-
-async function getPR0MapData(latitude, longitude) {
-  const mapContainer = document.getElementById('map-box-precipitation');
-  if (mapContainer && mapContainer._leaflet_id) {
-    mapContainer._leaflet_id = null;
-  }
-
-  mapContainer.innerHTML = '';
-
-  const PR0Map = L.map('map-box-precipitation', {dragging: false, scrollWheelZoom: false, touchZoom: false, doubleClickZoom: false}).setView([latitude, longitude], 7);
-  
-  const mapLayer =  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: 'Map &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-})
-
-  const weatherLayer = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/{op}/{z}/{x}/{y}?appid={apiKey}&opacity=0.6&fill_bound=true', {
-    apiKey: apiKey,
-    maxZoom: 18,
-    attribution: 'Weather &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>',
-    op: 'PR0',
-  })
-
-  // Add the layers to PR0Map
-  mapLayer.addTo(PR0Map);
-  weatherLayer.addTo(PR0Map);
-}
-async function getWNDMapData(latitude, longitude) {
-  const mapContainer = document.getElementById('map-box-wind');
-  if (mapContainer && mapContainer._leaflet_id) {
-    mapContainer._leaflet_id = null;
-  }
-
-  mapContainer.innerHTML = '';
-
-  const WNDMap = L.map('map-box-wind', {dragging: false, scrollWheelZoom: false, touchZoom: false, doubleClickZoom: false}).setView([latitude, longitude], 10);
-  
-  const mapLayer =  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: 'Map &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-})
-
-  const weatherLayer = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/{op}/{z}/{x}/{y}?appid={apiKey}&opacity=0.6&fill_bound=true', {
-    apiKey: apiKey,
-    maxZoom: 18,
-    attribution: 'Weather &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>',
-    op: 'WND',
-  })
-
-  // Add the layers to WNDMap
-  mapLayer.addTo(WNDMap);
-  weatherLayer.addTo(WNDMap);
 }
 
 // Function to handle and display weather data
@@ -457,18 +412,81 @@ function displayWeatherData(weatherData, place_name) {
 }
 
 // Function to display map data
-function displayMapData() {
-  const mapDataElement = document.getElementById('map-container');
-  mapDataElement.style.display = 'grid';
+function displayMapData(latitude, longitude) {
+  // Display the map container
+  const mapContainerDataElement = document.getElementById('map-container');
+  mapContainerDataElement.style.display = 'grid';
+
+  const mapBox = document.getElementById('map-box');
+  mapBox.style.display = 'block';
+
+  // Display the map title
   const mapTitle = document.getElementById('map-title');
-  mapTitle.innerHTML = `<h2>Temperature Map</h2>`;
-  const mapBoxTemperature = document.getElementById('map-box-temperature');
-  mapBoxTemperature.style.display = 'block';
-  const mapBoxPrecipitation = document.getElementById('map-box-precipitation');
-  mapBoxPrecipitation.style.display = 'none';
-  const mapBoxWind = document.getElementById('map-box-wind');
-  mapBoxWind.style.display = 'none';
-  getTA2MapData(latitude, longitude);
+  mapTitle.innerHTML = `<h2>Weather Maps</h2>`;
+
+  // Display the map
+  var map = L.map('map-box').setView([latitude, longitude], 10);
+
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: 'Map &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+
+  latitude = Math.round(latitude);
+  longitude = Math.round(longitude);
+  
+  // Display the clouds map
+  let layer = 'clouds_new';
+  var cloudsLayer = L.tileLayer(`https://weather-app-api-handler.glitch.me/OWM-Map-API?latitude={x}&longitude={y}&layer=${layer}&zoom={z}`, {
+    maxZoom: 18,
+    attribution: 'Clouds &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>'
+  });
+
+  // Display the precipitation map
+  layer = 'precipitation_new';
+  var precipitationLayer = L.tileLayer(`https://weather-app-api-handler.glitch.me/OWM-Map-API?latitude={x}&longitude={y}&layer=${layer}&zoom={z}`, {
+    maxZoom: 18,
+    attribution: 'Precipitation &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>'
+  });
+
+  // Display the pressure map
+  layer = 'pressure_new';
+  var pressureLayer = L.tileLayer(`https://weather-app-api-handler.glitch.me/OWM-Map-API?latitude={x}&longitude={y}&layer=${layer}&zoom={z}`, {
+    maxZoom: 18,
+    attribution: 'Pressure &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>'
+  });
+
+  // Display the wind map
+  layer = 'wind_new';
+  var windLayer = L.tileLayer(`https://weather-app-api-handler.glitch.me/OWM-Map-API?latitude={x}&longitude={y}&layer=${layer}&zoom={z}`, {
+    maxZoom: 18,
+    attribution: 'Wind &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>'
+  });
+
+  // Display the temperature map
+  layer = 'temp_new';
+  var temperatureLayer = L.tileLayer(`https://weather-app-api-handler.glitch.me/OWM-Map-API?latitude={x}&longitude={y}&layer=${layer}&zoom={z}`, {
+    maxZoom: 18,
+    attribution: 'Temperature &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>'
+  });
+
+  // Add the layers to the map
+
+  var baseMapLayers = {
+    "Clouds": cloudsLayer,
+    "Precipitation": precipitationLayer,
+    "Pressure": pressureLayer,
+    "Wind": windLayer,
+    "Temperature": temperatureLayer
+  };
+
+  var layerControl = L.control.layers(baseMapLayers, null, {
+    collapsed: false,
+    sortLayers: true
+  }).addTo(map);
+
+  cloudsLayer.addTo(map);
+  layerControl._update();
 }
 
 // Function to handle search when button is clicked or Enter is pressed
@@ -530,15 +548,6 @@ function closePopupWaiting() {
   popupWaiting.style.display = 'none';
 }
 
-// Function to start Node.js server
-function startNodeServer() {
-  const response = fetch(`https://weather-app-api-handler.glitch.me/startServer`);
-  if (!response.ok) {
-    throw new Error('Failed to start Node.js server.');
-  }
-  // console.log('Node.js server started.');
-}
-
 // Function to display the meme container
 const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 let konamiCodeIndex = 0;
@@ -577,49 +586,6 @@ locationInput.addEventListener('click', clearInputField);
 const weatherAppIcon = document.getElementById('weather-app-icon');
 weatherAppIcon.addEventListener('click', () => {
   location.reload();
-});
-
-// Function to display the map data
-const mapTemperature = document.getElementById('map-temperature');
-mapTemperature.addEventListener('click', () => {
-  const mapTitle = document.getElementById('map-title');
-  mapTitle.innerHTML = `<h2>Temperature Map</h2>`;
-  const mapBoxTemperature = document.getElementById('map-box-temperature');
-  mapBoxTemperature.style.display = 'block';
-  const mapBoxPrecipitation = document.getElementById('map-box-precipitation');
-  mapBoxPrecipitation.style.display = 'none';
-  const mapBoxWind = document.getElementById('map-box-wind');
-  mapBoxWind.style.display = 'none';
-  getTA2MapData(latitude, longitude);
-  window.scrollTo(0, document.body.scrollHeight);
-});
-
-const mapPrecipitation = document.getElementById('map-precipitation');
-mapPrecipitation.addEventListener('click', () => {
-  const mapTitle = document.getElementById('map-title');
-  mapTitle.innerHTML = `<h2>Precipitation Map</h2>`;
-  const mapBoxTemperature = document.getElementById('map-box-temperature');
-  mapBoxTemperature.style.display = 'none';
-  const mapBoxPrecipitation = document.getElementById('map-box-precipitation');
-  mapBoxPrecipitation.style.display = 'block';
-  const mapBoxWind = document.getElementById('map-box-wind');
-  mapBoxWind.style.display = 'none';
-  getPR0MapData(latitude, longitude);
-  window.scrollTo(0, document.body.scrollHeight);
-});
-
-const mapWind = document.getElementById('map-wind');
-mapWind.addEventListener('click', () => {
-  const mapTitle = document.getElementById('map-title');
-  mapTitle.innerHTML = `<h2>Wind Map</h2>`;
-  const mapBoxTemperature = document.getElementById('map-box-temperature');
-  mapBoxTemperature.style.display = 'none';
-  const mapBoxPrecipitation = document.getElementById('map-box-precipitation');
-  mapBoxPrecipitation.style.display = 'none';
-  const mapBoxWind = document.getElementById('map-box-wind');
-  mapBoxWind.style.display = 'block';
-  getWNDMapData(latitude, longitude);
-  window.scrollTo(0, document.body.scrollHeight);
 });
 
 // Handle Enter key press in input field
