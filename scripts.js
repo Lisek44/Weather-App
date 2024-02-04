@@ -10,13 +10,17 @@ function loadCSSBasedOnUserAgent() {
 
 // Function to start Node.js server
 async function startNodeServer() {
+  const locationInput = document.getElementById('location-input-field');
+  locationInput.disabled = true;
   displayPopupWaiting();
   const response = await fetch(`https://weather-app-api-handler.glitch.me/startServer`);
   if (!response.ok) {
     closePopupWaiting();
+    locationInput.disabled = false;
     throw new Error('Failed to start Node.js server.');
   }
   closePopupWaiting();
+  locationInput.disabled = false;
 }
 
 loadCSSBasedOnUserAgent();
@@ -480,10 +484,18 @@ function displayMapData(latitude, longitude) {
     "Temperature": temperatureLayer
   };
 
-  var layerControl = L.control.layers(baseMapLayers, null, {
-    collapsed: false,
-    sortLayers: true
-  }).addTo(map);
+  const userAgent = navigator.userAgent.toLowerCase();
+
+  if (userAgent.includes('android') || userAgent.includes('iphone') || userAgent.includes('ipad')) {
+    var layerControl = L.control.layers(baseMapLayers, null, {
+      sortLayers: true
+    }).addTo(map);
+  } else {
+    var layerControl = L.control.layers(baseMapLayers, null, {
+      collapsed: false,
+      sortLayers: true
+    }).addTo(map);
+  }
 
   cloudsLayer.addTo(map);
   layerControl._update();
