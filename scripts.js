@@ -1,3 +1,4 @@
+// Function to load CSS based on user agent
 function loadCSSBasedOnUserAgent() {
   const userAgent = navigator.userAgent.toLowerCase();
 
@@ -12,7 +13,7 @@ function loadCSSBasedOnUserAgent() {
 async function startNodeServer() {
   const locationInput = document.getElementById('location-input-field');
   locationInput.disabled = true;
-  displayPopupWaiting();
+  displayPopupWaiting('server start');
   const response = await fetch(`https://weather-app-api-handler.glitch.me/startServer`);
   if (!response.ok) {
     closePopupWaiting();
@@ -23,21 +24,23 @@ async function startNodeServer() {
   locationInput.disabled = false;
 }
 
+// Call the functions
 loadCSSBasedOnUserAgent();
 startNodeServer();
 
+// Start of the variables and functions for the weather app
 localStorage.setItem('popupClosed', false);
-
 var map = null;
-
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 const modeSlider = document.getElementById('modeSlider');
 const modeText = document.getElementById('modeText');
 const MODE_KEY = 'websiteMode';
 
+// Function to capitalize the first letter of a string
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// Function to update the mode of the website
 function updateMode(mode) {
   switch (mode) {
     case 'Light':
@@ -79,6 +82,7 @@ async function getLocationSuggestions(query) {
       throw new Error('Request timed out.');
     }, 5000);
 
+    // Fetch location suggestions from MapBox API using query to Glitch server
     const response = await fetch(`https://weather-app-api-handler.glitch.me/mapboxSuggestions?suggestQuery=${query}`, {
       signal: controller.signal
     });
@@ -108,6 +112,7 @@ function displayLocationSuggestions(suggestions) {
   suggestionsList.style.display = 'block';
   suggestionsList.innerHTML = '';
 
+  // Display the suggestions in a list
   suggestions.forEach(suggestion => {
     const listItem = document.createElement('li');
     listItem.textContent = suggestion.place_name;
@@ -148,6 +153,7 @@ async function handleInput() {
   const locationInput = document.getElementById('location-input-field').value;
   const suggestionsList = document.getElementById('suggestions-list');
   
+  // Fetch location suggestions from MapBox API
   if (locationInput.length >= 3) {
     const suggestions = await getLocationSuggestions(locationInput);
     displayLocationSuggestions(suggestions);
@@ -160,7 +166,7 @@ async function handleInput() {
 // Functions to fetch weather data from OpenWeatherMap API
 async function getWeatherData(latitude, longitude) {
   try {
-    displayPopupWaiting();
+    displayPopupWaiting('server response');
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -169,6 +175,7 @@ async function getWeatherData(latitude, longitude) {
       throw new Error('Request timed out.');
     }, 5000);
 
+    // Fetch weather data from Glitch server using latitude and longitude
     const response = await fetch(`https://weather-app-api-handler.glitch.me/One-Call-API?latitude=${latitude}&longitude=${longitude}`, {
       signal: controller.signal
     });
@@ -192,7 +199,7 @@ async function getWeatherData(latitude, longitude) {
 async function getMapData(latitude, longitude, layer, zoom) {
 
   try {
-    displayPopupWaiting();
+    displayPopupWaiting('server response');
 
     latitude = Math.round(latitude);
     longitude = Math.round(longitude);
@@ -204,6 +211,7 @@ async function getMapData(latitude, longitude, layer, zoom) {
       throw new Error('Request timed out.');
     }, 5000);
 
+    // Fetch map data from Glitch server using latitude, longitude, layer, and zoom
     const response = await fetch(`https://weather-app-api-handler.glitch.me/OWM-Map-API?latitude=${latitude}&longitude=${longitude}&layer=${layer}&zoom=${zoom}`, {
       signal: controller.signal
     });
@@ -229,15 +237,15 @@ function displayWeatherData(weatherData, place_name) {
   const currentWeatherTitle = document.getElementById('current-weather-title');
   currentWeatherTitle.innerHTML = `<h2>Current Weather in ${place_name}</h2>`;
 
+  // Configure the sunrise and sunset times with timezone offset and browser time
   const browserTime = new Date();
   const timezoneOffset = browserTime.getTimezoneOffset() * 60;
-
   const sunrise = new Date(weatherData.current.sunrise * 1000);
   const sunset = new Date(weatherData.current.sunset * 1000);
-
   sunrise.setTime(sunrise.getTime() + weatherData.timezone_offset * 1000 + timezoneOffset * 1000);
   sunset.setTime(sunset.getTime() + weatherData.timezone_offset * 1000 + timezoneOffset * 1000);
 
+  // Display the current weather data
   const currentWeatherElement = document.getElementById('current-weather');
   currentWeatherElement.innerHTML = `
     <p class="current-weather-description">Weather: ${capitalizeFirstLetter(weatherData.current.weather[0].description)}</p>
@@ -251,6 +259,7 @@ function displayWeatherData(weatherData, place_name) {
     <p class="current-weather-sunset">Sunset: ${sunset.toLocaleTimeString()}</p>
   `;
 
+  // Display the current weather icon and change the background color based on the weather
   const currentWeatherIcon = document.getElementById('current-weather-icon');
   const weatherIconID = weatherData.current.weather[0].icon;
 
@@ -348,6 +357,7 @@ function displayWeatherData(weatherData, place_name) {
   const currentWeatherContainer = document.getElementById('current-weather-container');
   currentWeatherContainer.style.display = 'grid';
 
+
   // Display Forecast Hourly data
   const forecastHourlyDataElement = document.getElementById('forecast-hourly-box');
   forecastHourlyDataElement.innerHTML = '';
@@ -378,6 +388,7 @@ function displayWeatherData(weatherData, place_name) {
   // Display the forecast title and table
   const forecastHourlyContainer = document.getElementById('forecast-hourly-container');
   forecastHourlyContainer.style.display = 'grid';
+
 
   // Display Forecast Daily data
   const forecastDailyDataElement = document.getElementById('forecast-daily-box');
@@ -421,19 +432,20 @@ function displayMapData(latitude, longitude) {
   const mapContainerDataElement = document.getElementById('map-container');
   mapContainerDataElement.style.display = 'grid';
 
+  // Display the map title and map box
   const mapBox = document.getElementById('map-box');
   mapBox.style.display = 'block';
-
-  // Display the map title
   const mapTitle = document.getElementById('map-title');
   mapTitle.innerHTML = `<h2>Weather Maps</h2>`;
 
-  // Display the map
+  // Check if map already exists and remove it if it does
   if (map) {
     map.remove();
   }
+  // Create a new map
   map = L.map('map-box').setView([latitude, longitude], 10);
 
+  // Display the OpenStreetMap layer
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
     attribution: 'Map &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -478,7 +490,6 @@ function displayMapData(latitude, longitude) {
   });
 
   // Add the layers to the map
-
   var baseMapLayers = {
     "Clouds": cloudsLayer,
     "Precipitation": precipitationLayer,
@@ -487,8 +498,8 @@ function displayMapData(latitude, longitude) {
     "Temperature": temperatureLayer
   };
 
+  // Add the layer control to the map depending on the user agent
   const userAgent = navigator.userAgent.toLowerCase();
-
   if (userAgent.includes('android') || userAgent.includes('iphone') || userAgent.includes('ipad')) {
     var layerControl = L.control.layers(baseMapLayers, null, {
       sortLayers: true
@@ -500,15 +511,18 @@ function displayMapData(latitude, longitude) {
     }).addTo(map);
   }
 
+  // Add the clouds layer to the map as first layer
   cloudsLayer.addTo(map);
   layerControl._update();
+
+  // TODO: Adding Legend for each layer
 }
 
 // Function to handle search when button is clicked or Enter is pressed
 function searchWeatherOnClick() {
   const locationInput = document.getElementById('location-input-field').value;
 
-  if (locationInput.length > 0) {
+  if (locationInput.length > 2) {
     // Fetch suggestions from MapBox API
     getLocationSuggestions(locationInput)
       .then(suggestions => {
@@ -551,9 +565,9 @@ function closePopup() {
 }
 
 // Function to display the popup-waiting
-function displayPopupWaiting() {
+function displayPopupWaiting(message) {
   const popupWaiting = document.getElementById('popup-waiting');
-  popupWaiting.innerHTML = `<p>Waiting for server response...</p>`;
+  popupWaiting.innerHTML = `<p>Waiting for ${message}...</p>`;
   popupWaiting.style.display = 'block';
 }
 
