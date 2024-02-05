@@ -4,11 +4,11 @@ This is a simple web application that provides real-time weather information. Th
 
 ## Features
 
-- **Current Weather:** Get the latest information about the weather, including temperature, humidity, and wind speed et cetera.
-- **Hourly Forecast:** View the weather forecast for the upcoming hours.
-- **Daily Forecast:** Plan ahead with a detailed daily weather forecast.
 - **Location-based:** Enter the name of your city or any location to get accurate weather data.
-- **Interactive Map:** Explore an interactive map with three modes - temperature, precipitation, and wind.
+- **Current Weather:** Get the latest information about the weather, including temperature, humidity, and wind speed and more.
+- **Hourly Forecast:** View the weather forecast for the upcoming 24 hours.
+- **Daily Forecast:** Plan ahead with a detailed daily weather forecast.
+- **Interactive Map:** Explore an interactive map with several modes including: temperature, precipitation, wind and more.
 - **Responsive Design:** The app is designed to work seamlessly on both desktop and mobile devices.
 
 ## How to Use
@@ -22,6 +22,8 @@ This is a simple web application that provides real-time weather information. Th
 - HTML
 - CSS
 - JavaScript
-- OpenWeatherMap API
-- MapBox API
+- OpenStreetMap API
+- OpenWeatherMap One Call API 3.0
+- OpenWeatherMap Basic weather maps
+- MapBox Temporary Geocoding API
 - Leaflet Map plugin
