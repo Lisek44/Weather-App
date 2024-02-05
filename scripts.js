@@ -26,9 +26,9 @@ async function startNodeServer() {
 loadCSSBasedOnUserAgent();
 startNodeServer();
 
-// const apiKey = '49b0abfbcd72adcfc70fc7f555198b19';
-
 localStorage.setItem('popupClosed', false);
+
+var map = null;
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -429,7 +429,10 @@ function displayMapData(latitude, longitude) {
   mapTitle.innerHTML = `<h2>Weather Maps</h2>`;
 
   // Display the map
-  var map = L.map('map-box').setView([latitude, longitude], 10);
+  if (map) {
+    map.remove();
+  }
+  map = L.map('map-box').setView([latitude, longitude], 10);
 
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
