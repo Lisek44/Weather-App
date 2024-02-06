@@ -23,17 +23,12 @@ async function startNodeServer() {
     locationInput.disabled = false;
     throw new Error('Failed to start Node.js server.');
   }
-  closePopupWaiting();
-  locationInput.disabled = false;
-}
-
-// Call the functions
-loadCSSBasedOnUserAgent();
-startNodeServer();
-
-// Geo Location
+  // Geo Location
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(position);
+}
+  closePopupWaiting();
+  locationInput.disabled = false;
 }
 
 function position(position) {
@@ -43,6 +38,10 @@ function position(position) {
   locationInput.value = `${longitude},${latitude}`;
   searchWeatherOnClick();
 }
+
+// Call the functions
+loadCSSBasedOnUserAgent();
+startNodeServer();
 
 // Start of the variables and functions for the weather app
 localStorage.setItem('popupClosed', false);
