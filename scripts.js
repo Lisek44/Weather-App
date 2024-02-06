@@ -1,3 +1,6 @@
+// TODO: Add Favourites, Add Search History
+// TODO: Adding Legend for each layer
+
 // Function to load CSS based on user agent
 function loadCSSBasedOnUserAgent() {
   const userAgent = navigator.userAgent.toLowerCase();
@@ -527,8 +530,6 @@ function displayMapData(latitude, longitude) {
   // Add the clouds layer to the map as first layer
   cloudsLayer.addTo(map);
   layerControl._update();
-
-  // TODO: Adding Legend for each layer
 }
 
 // Function to handle search when button is clicked or Enter is pressed
