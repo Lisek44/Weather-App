@@ -9,6 +9,19 @@ function loadCSSBasedOnUserAgent() {
   }
 }
 
+// Geo Location
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(position);
+}
+
+function position(position) {
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+  const locationInput = document.getElementById('location-input-field');
+  locationInput.value = `${latitude},${longitude}`;
+  searchWeatherOnClick();
+}
+
 // Function to start Node.js server
 async function startNodeServer() {
   const locationInput = document.getElementById('location-input-field');
@@ -394,7 +407,7 @@ function displayWeatherData(weatherData, place_name) {
   const forecastDailyDataElement = document.getElementById('forecast-daily-box');
   forecastDailyDataElement.innerHTML = '';
 
-  weatherData.daily.slice(0, 7).forEach(day => {
+  weatherData.daily.slice(1, 8).forEach(day => {
     const date = new Date(day.dt * 1000 + weatherData.timezone_offset * 1000 + timezoneOffset * 1000);
     const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
     const weather = day.weather[0];
