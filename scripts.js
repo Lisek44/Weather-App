@@ -12,19 +12,6 @@ function loadCSSBasedOnUserAgent() {
   }
 }
 
-// Geo Location
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(position);
-}
-
-function position(position) {
-  const latitude = position.coords.latitude;
-  const longitude = position.coords.longitude;
-  const locationInput = document.getElementById('location-input-field');
-  locationInput.value = `${longitude},${latitude}`;
-  searchWeatherOnClick();
-}
-
 // Function to start Node.js server
 async function startNodeServer() {
   const locationInput = document.getElementById('location-input-field');
@@ -43,6 +30,19 @@ async function startNodeServer() {
 // Call the functions
 loadCSSBasedOnUserAgent();
 startNodeServer();
+
+// Geo Location
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(position);
+}
+
+function position(position) {
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+  const locationInput = document.getElementById('location-input-field');
+  locationInput.value = `${longitude},${latitude}`;
+  searchWeatherOnClick();
+}
 
 // Start of the variables and functions for the weather app
 localStorage.setItem('popupClosed', false);
