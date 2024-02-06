@@ -18,7 +18,7 @@ function position(position) {
   const latitude = position.coords.latitude;
   const longitude = position.coords.longitude;
   const locationInput = document.getElementById('location-input-field');
-  locationInput.value = `${latitude},${longitude}`;
+  locationInput.value = `${longitude},${latitude}`;
   searchWeatherOnClick();
 }
 
