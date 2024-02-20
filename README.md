@@ -27,3 +27,4 @@ This is a simple web application that provides real-time weather information. Th
 - OpenWeatherMap Basic weather maps
 - MapBox Temporary Geocoding API
 - Leaflet Map plugin
+- Node.js server hosted on [Glitch](https://glitch.com/~weather-app-api-handler)
